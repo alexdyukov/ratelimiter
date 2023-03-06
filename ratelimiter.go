@@ -8,19 +8,21 @@ import (
 	"sync/atomic"
 )
 
-// Bottleneck represents gate keeper for rate limiter.
-// See bottleneck subpackage for examples.
-type Bottleneck interface {
-	BreakThrough()
-	MaxRate() int
-}
+type (
+	// Bottleneck represents gate keeper for rate limiter.
+	// See bottleneck subpackage for examples.
+	Bottleneck interface {
+		BreakThrough()
+		MaxRate() int
+	}
 
-// RateLimiter implement rate limiter with wait option.
-type RateLimiter struct {
-	notify  chan struct{}
-	curRate int32
-	maxRate int32
-}
+	// RateLimiter implement rate limiter with wait option.
+	RateLimiter struct {
+		notify  chan struct{}
+		curRate int32
+		maxRate int32
+	}
+)
 
 // Take returns true until rate and burst reached, false overwise.
 // Requests over rate (rate < i <= rate+burst) holds in queue before next spot released.
