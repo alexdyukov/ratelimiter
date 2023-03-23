@@ -4,8 +4,14 @@ go 1.18
 
 replace github.com/alexdyukov/ratelimiter => ./
 
+retract (
+	v1.0.5 // invalid implementation
+	v1.0.4 // invalid implementation
+	v1.0.0 // invalid implementation
+)
+
 require (
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	go.uber.org/ratelimit v0.2.0
 	golang.org/x/time v0.3.0
 )
