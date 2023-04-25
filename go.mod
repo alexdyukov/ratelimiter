@@ -5,6 +5,7 @@ go 1.18
 replace github.com/alexdyukov/ratelimiter => ./
 
 retract (
+	v1.1.0 // invalid implementation
 	v1.0.5 // invalid implementation
 	v1.0.4 // invalid implementation
 	v1.0.0 // invalid implementation
