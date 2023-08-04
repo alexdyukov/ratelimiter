@@ -28,7 +28,7 @@ func wrappedTestBottleneck(t *testing.T, bn testBottleneck, approxTotal, approxA
 
 	spend := time.Since(startTime)
 	lower := time.Duration(0.95 * float64(approxTotal))
-	higher := time.Duration(1.15 * float64(approxTotal))
+	higher := time.Duration(1.05 * float64(approxTotal))
 
 	assert.True(t, lower < spend && spend < higher, "%v rps with %v total requests should spend at least %v and no more %v, but spend: %v", rps, totalRequests, lower, higher, spend)
 
@@ -40,7 +40,7 @@ func wrappedTestBottleneck(t *testing.T, bn testBottleneck, approxTotal, approxA
 
 	spend = time.Since(startTime)
 	lower = time.Duration(0.95 * float64(approxAdditional))
-	higher = time.Duration(1.15 * float64(approxAdditional))
+	higher = time.Duration(1.05 * float64(approxAdditional))
 
 	assert.True(t, lower < spend && spend < higher, "%v rps with %v total requests should spend at least %v and no more %v, but spend: %v", rps, totalRequests, lower, higher, spend)
 }
