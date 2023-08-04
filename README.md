@@ -16,25 +16,24 @@ Package provides methods to rate limit any type of requests (not only http). Use
 
 ### [x/time/rate](https://pkg.go.dev/golang.org/x/time/rate)
 - `x/time/rate` cannot cancel request or shrink queue
-- `x/time/rate` is faster. See benchmark block for `BenchmarkOverheadXTimeRate` and `BenchmarkOverheadRateLimiterEqualizerBottleneck`
 
 ## Benchmarks
 
 Overhead of each Take()/Wait() request with infinity rate:
 ```go
-$ # RegularBottleneck lies on memory usage because Regular Bottleneck use slice with len = RPS
-$ go test -bench=. -benchmem -benchtime=1000000x
+$ # RegularBottleneck lies on memory usage because uses slice of time.Time{} with length of required RPS
+$ go test -bench=. -benchmem -benchtime=10000000x
 goos: linux
 goarch: amd64
 pkg: github.com/alexdyukov/ratelimiter
 cpu: AMD Ryzen 7 5800U with Radeon Graphics
-BenchmarkOverheadXTimeRate-16                            1000000               168.4 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadUber-16                                 1000000               180.9 ns/op            32 B/op          1 allocs/op
-BenchmarkOverheadRateLimiterRegularBottleneck-16         1000000               254.3 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterValveBottleneck-16           1000000               193.2 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterEqualizerBottleneck-16       1000000               260.2 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadXTimeRate-16                           10000000               173.0 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadUber-16                                10000000               100.6 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterRegularBottleneck-16        10000000               256.6 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterValveBottleneck-16          10000000               175.1 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterEqualizerBottleneck-16      10000000               255.8 ns/op             0 B/op          0 allocs/op
 PASS
-ok      github.com/alexdyukov/ratelimiter       6.932s
+ok      github.com/alexdyukov/ratelimiter       16.011s
 ```
 
 ## Example

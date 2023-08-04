@@ -1,0 +1,35 @@
+name: update_deps
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  update_depsifneedit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'oldstable'
+          check-latest: true
+
+      - name: Git checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update dependencies
+        run: go get -u ./... && go mod tidy
+
+      - name: Commit changes and create PR if needed
+        run: |
+          git config --global user.name 'update_deps robot'
+          git config --global user.email 'noreply@example.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git checkout -b fix/autoupdate_dependencies
+          git commit -am "Fix: $(date +%F) update dependencies"
+          git push && gh pr create -a ${{ github.repository_owner }} --fill || echo "Nothing to update" 
+
