@@ -12,22 +12,27 @@ import (
 
 func BenchmarkOverheadXTimeRate(b *testing.B) {
 	b.StopTimer()
-	rl := rate.NewLimiter(rate.Limit(overheadTestRPS), overheadTestBurst)
+
+	rateLimiter := rate.NewLimiter(rate.Limit(overheadTestRPS), overheadTestBurst)
 
 	ctx := context.Background()
 
 	b.StartTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_ = rl.Wait(ctx)
+			err := rateLimiter.Wait(ctx)
+			if err != nil {
+				b.Error(err)
+			}
 		}
 	})
 }
 
 func BenchmarkOverheadUber(b *testing.B) {
 	b.StopTimer()
+
 	// no burst option for uber's rate limiter
-	rl := ratelimit.New(overheadTestRPS)
+	rateLimiter := ratelimit.New(overheadTestRPS)
 
 	// no need context, cause uber's rate limiter doesn not support cancels
 	// ctx := context.Background()
@@ -35,15 +40,17 @@ func BenchmarkOverheadUber(b *testing.B) {
 	b.StartTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			rl.Take()
+			rateLimiter.Take()
 		}
 	})
 }
 
 func BenchmarkOverheadRateLimiterRegularBottleneck(b *testing.B) {
 	b.StopTimer()
+
 	bn := bottleneck.NewRegular(overheadTestRPS, overheadTestBurst)
-	rl, shutdown := ratelimiter.New(bn)
+
+	rateLimiter, shutdown := ratelimiter.New(bn)
 	defer shutdown()
 
 	ctx := context.Background()
@@ -51,15 +58,17 @@ func BenchmarkOverheadRateLimiterRegularBottleneck(b *testing.B) {
 	b.StartTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			rl.Take(ctx)
+			rateLimiter.Take(ctx)
 		}
 	})
 }
 
 func BenchmarkOverheadRateLimiterValveBottleneck(b *testing.B) {
 	b.StopTimer()
+
 	bn := bottleneck.NewValve(overheadTestRPS, overheadTestBurst)
-	rl, shutdown := ratelimiter.New(bn)
+
+	rateLimiter, shutdown := ratelimiter.New(bn)
 	defer shutdown()
 
 	ctx := context.Background()
@@ -67,15 +76,17 @@ func BenchmarkOverheadRateLimiterValveBottleneck(b *testing.B) {
 	b.StartTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			rl.Take(ctx)
+			rateLimiter.Take(ctx)
 		}
 	})
 }
 
 func BenchmarkOverheadRateLimiterEqualizerBottleneck(b *testing.B) {
 	b.StopTimer()
+
 	bn := bottleneck.NewEqualizer(overheadTestRPS, overheadTestBurst)
-	rl, shutdown := ratelimiter.New(bn)
+
+	rateLimiter, shutdown := ratelimiter.New(bn)
 	defer shutdown()
 
 	ctx := context.Background()
@@ -83,7 +94,7 @@ func BenchmarkOverheadRateLimiterEqualizerBottleneck(b *testing.B) {
 	b.StartTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			rl.Take(ctx)
+			rateLimiter.Take(ctx)
 		}
 	})
 }
