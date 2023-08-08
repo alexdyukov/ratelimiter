@@ -1,8 +1,6 @@
 run:
   timeout: 5m
-  tests: false
   modules-download-mode: readonly
-  go: 1.19
 
 linters:
   enable-all: true
@@ -74,6 +72,7 @@ linters-settings:
   tenv:
     all: true
   varnamelen:
+    max-distance: 20
     check-receiver: true
     check-return: true
     check-type-param: true
@@ -87,3 +86,11 @@ linters-settings:
     multi-func: true
   nonamedresult:
     report-error-in-defer: true
+  depguard:
+    rules:
+      main:
+        files:
+          - "$all"
+          - "!$test"
+        allow:
+          - "$gostd"

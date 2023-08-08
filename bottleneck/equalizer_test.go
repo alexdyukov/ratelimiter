@@ -8,11 +8,13 @@ import (
 )
 
 func TestEqualizer(t *testing.T) {
+	t.Parallel()
+
 	bn := bottleneck.NewEqualizer(rps, burst)
 
-	overhead_multiplier := float64(1.1)
+	overheadMultiplier := float64(1.1)
 
-	approxTotal := float64(totalRequests) / float64(rps) * float64(time.Second) * overhead_multiplier
-	approxAdditional := float64(additionalPool) / float64(rps) * float64(time.Second) * overhead_multiplier
+	approxTotal := float64(totalRequests) / float64(rps) * float64(time.Second) * overheadMultiplier
+	approxAdditional := float64(additionalPool) / float64(rps) * float64(time.Second) * overheadMultiplier
 	wrappedTestBottleneck(t, bn, time.Duration(approxTotal), time.Duration(approxAdditional))
 }
