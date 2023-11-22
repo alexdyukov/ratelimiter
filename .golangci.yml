@@ -84,7 +84,7 @@ linters-settings:
   whitespace:
     multi-if: true
     multi-func: true
-  nonamedresult:
+  nonamedreturns:
     report-error-in-defer: true
   depguard:
     rules:
