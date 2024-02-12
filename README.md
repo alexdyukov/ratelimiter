@@ -2,7 +2,7 @@
 Go universal rate limiter with easy to use API.
 ====
 [![GoDoc](https://godoc.org/github.com/alexdyukov/ratelimiter?status.svg)](https://godoc.org/github.com/alexdyukov/ratelimiter)
-[![CI](https://github.com/alexdyukov/ratelimiter/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/alexdyukov/ratelimiter/actions/workflows/lint.yml?query=branch%3Amaster)
+[![Tests](https://github.com/alexdyukov/ratelimiter/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/alexdyukov/ratelimiter/actions/workflows/tests.yml?query=branch%3Amaster)
 
 Package provides methods to rate limit any type of requests (not only http). Use builtin Bottlenecks or write your own for custom bottle neck logic.
 
@@ -11,7 +11,7 @@ Package provides methods to rate limit any type of requests (not only http). Use
 ### [go.uber.org/ratelimit](https://pkg.go.dev/go.uber.org/ratelimit)
 - `go.uber.org/ratelimit` is not FIFO
 - `go.uber.org/ratelimit` does not support `burst` option
-- `go.uber.org/ratelimit` cannot cancel request
+- `go.uber.org/ratelimit` cannot cancel request or shrink queue
 - `go.uber.org/ratelimit` is faster. See benchmark block for `BenchmarkOverheadUber` and `BenchmarkOverheadRateLimiterEqualizerBottleneck`
 
 ### [x/time/rate](https://pkg.go.dev/golang.org/x/time/rate)
