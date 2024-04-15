@@ -26,8 +26,7 @@ func TestContextCancel(t *testing.T) {
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	successCount := atomic.Int32{}
 
@@ -65,8 +64,7 @@ func TestNoOverflow(t *testing.T) {
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	startTime := time.Now()
 
@@ -98,8 +96,7 @@ func TestOverflow(t *testing.T) {
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	successCount := atomic.Int32{}
 	failCount := atomic.Int32{}

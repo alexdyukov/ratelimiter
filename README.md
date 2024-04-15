@@ -9,13 +9,14 @@ Package provides methods to rate limit any type of requests (not only http). Use
 ## Compares to most popular solutions
 
 ### [go.uber.org/ratelimit](https://pkg.go.dev/go.uber.org/ratelimit)
-- `go.uber.org/ratelimit` is not FIFO
 - `go.uber.org/ratelimit` does not support `burst` option
 - `go.uber.org/ratelimit` cannot cancel request or shrink queue
-- `go.uber.org/ratelimit` is faster. See benchmark block for `BenchmarkOverheadUber` and `BenchmarkOverheadRateLimiterEqualizerBottleneck`
 
 ### [x/time/rate](https://pkg.go.dev/golang.org/x/time/rate)
 - `x/time/rate` cannot cancel request or shrink queue
+
+### [github.com/reugn/equalizer](https://pkg.go.dev/github.com/reugn/equalizer)
+- `github.com/reugn/equalizer` does not support `burst` option
 
 ## Benchmarks
 
