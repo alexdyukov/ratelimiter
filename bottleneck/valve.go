@@ -7,7 +7,7 @@ import (
 // Valve typed Bottleneck similar to heart valve.
 // Holds all together and pass them at one time.
 type Valve struct {
-	lastCheckout time.Time
+	lastCheckout int64
 	currentRate  int
 	rps          int
 	burst        int
@@ -21,12 +21,14 @@ func (bottleneck *Valve) BreakThrough() {
 		return
 	}
 
-	if time.Since(bottleneck.lastCheckout) < time.Second {
-		time.Sleep(time.Second)
+	now := time.Now().UnixNano()
+
+	if now-bottleneck.lastCheckout < int64(time.Second) {
+		time.Sleep(time.Duration(bottleneck.lastCheckout + int64(time.Second) - now))
 	}
 
 	bottleneck.currentRate = 1
-	bottleneck.lastCheckout = time.Now()
+	bottleneck.lastCheckout = time.Now().UnixNano()
 }
 
 // MaxRate returns max rate for both simultaneously processed and in queue requests.
@@ -45,7 +47,7 @@ func NewValve(rps, burst int) *Valve {
 	}
 
 	return &Valve{
-		lastCheckout: time.Now(),
+		lastCheckout: time.Now().UnixNano(),
 		currentRate:  0,
 		rps:          rps,
 		burst:        burst,

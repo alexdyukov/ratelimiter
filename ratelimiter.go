@@ -43,8 +43,7 @@ func (ratelimiter *RateLimiter) Take(ctx context.Context) bool {
 	}
 }
 
-// New returns an initialized RateLimiter and shutdown function.
-// Shutdown function completes RateLimiter's instance background tasks.
+// New returns an initialized RateLimiter with provided Bottleneck.
 func New(bottleneck Bottleneck) *RateLimiter {
 	if bottleneck == nil {
 		panic("ratelimiter: bottleneck argument cannot be nil")

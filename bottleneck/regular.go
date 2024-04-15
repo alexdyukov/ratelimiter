@@ -7,16 +7,19 @@ import (
 // Regular typed Bottleneck similar to attractions queue.
 // Provides uniform distribution of requests to stabilize CPU load.
 type Regular struct {
-	data  []time.Time
+	data  []int64
 	pos   int
 	burst int
 }
 
 // BreakThrough passes through bottle neck. Waits and pass if it busy.
 func (bottleneck *Regular) BreakThrough() {
-	nextAvailable := bottleneck.data[bottleneck.pos].Add(time.Second)
-	time.Sleep(time.Until(nextAvailable))
-	bottleneck.data[bottleneck.pos] = time.Now()
+	nextAvailable := bottleneck.data[bottleneck.pos] + time.Second.Nanoseconds()
+	now := time.Now().UnixNano()
+
+	time.Sleep(time.Duration(nextAvailable - now))
+
+	bottleneck.data[bottleneck.pos] = time.Now().UnixNano()
 	bottleneck.pos = (bottleneck.pos + 1) % len(bottleneck.data)
 }
 
@@ -36,15 +39,15 @@ func NewRegular(rps, burst int) *Regular {
 	}
 
 	bottleneck := Regular{
-		data:  make([]time.Time, rps),
+		data:  make([]int64, rps),
 		pos:   0,
 		burst: burst,
 	}
 
-	someSecondsBefore := time.Now().Add(-1 * time.Second)
+	someTimeBefore := time.Now().Add(-1 * time.Second).UnixNano()
 
 	for i := range bottleneck.data {
-		bottleneck.data[i] = someSecondsBefore
+		bottleneck.data[i] = someTimeBefore
 	}
 
 	return &bottleneck
