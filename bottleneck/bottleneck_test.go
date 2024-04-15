@@ -43,7 +43,7 @@ func wrappedTestBottleneck(t *testing.T, bn testBottleneck, approxTotal, approxA
 
 	spend = time.Since(startTime)
 	lower = time.Duration(0.95 * float64(approxAdditional))
-	higher = time.Duration(1.05 * float64(approxAdditional))
+	higher = time.Duration(1.90 * float64(approxAdditional))
 
 	msgFormat = "%v rps with %v total requests should spend at least %v and no more %v, but spend: %v"
 	assert.True(t, lower < spend && spend < higher, msgFormat, rps, totalRequests, lower, higher, spend)

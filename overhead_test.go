@@ -52,8 +52,7 @@ func BenchmarkOverheadRateLimiterRegularBottleneck(b *testing.B) {
 
 	bn := bottleneck.NewRegular(overheadTestRPS, overheadTestBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 
@@ -112,8 +111,7 @@ func BenchmarkOverheadRateLimiterValveBottleneck(b *testing.B) {
 
 	bn := bottleneck.NewValve(overheadTestRPS, overheadTestBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 
@@ -130,8 +128,7 @@ func BenchmarkOverheadRateLimiterEqualizerBottleneck(b *testing.B) {
 
 	bn := bottleneck.NewEqualizer(overheadTestRPS, overheadTestBurst)
 
-	rateLimiter, shutdown := ratelimiter.New(bn)
-	defer shutdown()
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 
