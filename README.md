@@ -30,11 +30,11 @@ pkg: github.com/alexdyukov/ratelimiter
 cpu: AMD Ryzen 7 5800U with Radeon Graphics
 BenchmarkOverheadXTimeRate-16                           10000000               173.0 ns/op             0 B/op          0 allocs/op
 BenchmarkOverheadUber-16                                10000000                37.02 ns/op            0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterRegularBottleneck-16        10000000               292.2 ns/op             0 B/op          0 allocs/op
 BenchmarkOverheadReugnEqualizerTokenBucket-16           10000000               149.3 ns/op             0 B/op          0 allocs/op
 BenchmarkOverheadReugnEqualizerSlider-16                10000000               135.2 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterRegularBottleneck-16        10000000               256.6 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterValveBottleneck-16          10000000               175.1 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterEqualizerBottleneck-16      10000000               255.8 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterValveBottleneck-16          10000000               202.5 ns/op             0 B/op          0 allocs/op
+BenchmarkOverheadRateLimiterEqualizerBottleneck-16      10000000               283.3 ns/op             0 B/op          0 allocs/op
 PASS
 ok      github.com/alexdyukov/ratelimiter       16.011s
 ```
