@@ -10,17 +10,19 @@ import (
 	"github.com/alexdyukov/ratelimiter"
 	"github.com/alexdyukov/ratelimiter/bottleneck"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/goleak"
 )
 
 const (
-	overheadTestRPS   = int(time.Second / time.Duration(10))
-	overheadTestBurst = 5
-	testRPS           = 10
-	testBurst         = 5
+	overheadTestMinDuration = time.Duration(10)
+	overheadTestRPS         = int(time.Second / overheadTestMinDuration)
+	overheadTestBurst       = 5
+	testRPS                 = 10
+	testBurst               = 5
 )
 
 func TestContextCancel(t *testing.T) {
-	t.Parallel()
+	defer detectLeak(t)
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
@@ -59,7 +61,7 @@ func TestContextCancel(t *testing.T) {
 }
 
 func TestNoOverflow(t *testing.T) {
-	t.Parallel()
+	defer detectLeak(t)
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
@@ -92,7 +94,7 @@ func TestNoOverflow(t *testing.T) {
 }
 
 func TestOverflow(t *testing.T) {
-	t.Parallel()
+	defer detectLeak(t)
 
 	bn := bottleneck.NewValve(testRPS, testBurst)
 
@@ -123,4 +125,13 @@ func TestOverflow(t *testing.T) {
 
 	msgFormat = "RateLimiter.Take() should fail at least once when we push over queue, but %v"
 	assert.Less(t, int32(0), failCount.Load(), msgFormat, failCount.Load())
+}
+
+func detectLeak(t *testing.T) func() {
+	return func() {
+		// let background shutdown function completes
+		time.Sleep(time.Second)
+
+		goleak.VerifyNone(t)
+	}
 }

@@ -8,8 +8,6 @@ import (
 )
 
 func TestEqualizer(t *testing.T) {
-	t.Parallel()
-
 	bn := bottleneck.NewEqualizer(rps, burst)
 
 	overheadMultiplier := float64(1.1)

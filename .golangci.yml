@@ -17,8 +17,10 @@ linters-settings:
   gosimple:
     checks: ["all"]
   govet:
-    check-shadowing: true
     enable-all: true
+    settings:
+      shadow:
+        strict: true
   staticcheck:
     checks: ["all"]
   decorder:
@@ -30,11 +32,7 @@ linters-settings:
   errchkjson:
     report-no-exported: true
   exhaustive:
-    check-generated: true
     default-signifies-exhaustive: true
-  gci:
-    no-inline-comments: true
-    no-prefix-comments: true
   gocognit:
     min-complexity: 10
   gocritic:
@@ -49,10 +47,6 @@ linters-settings:
         paramsOnly: false
       hugeParam:
         sizeThreshold: 40
-      truncateCmp:
-        skipArchDependent: false
-      underef:
-        skipRecvDeref: false
   gofumpt:
     extra-rules: true
   gomoddirectives:
@@ -65,15 +59,12 @@ linters-settings:
     const-require-single-const: true
     const-require-grouping: true
     import-require-single-import: true
-    import-require-grouping: false
+    import-require-grouping: true
     type-require-single-type: true
     type-require-grouping: false
     var-require-single-var: true
     var-require-grouping: false
-  tenv:
-    all: true
   varnamelen:
-    max-distance: 20
     check-receiver: true
     check-return: true
     check-type-param: true

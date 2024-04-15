@@ -5,6 +5,7 @@ package ratelimiter
 
 import (
 	"context"
+	"runtime"
 	"sync/atomic"
 )
 
@@ -19,8 +20,8 @@ type (
 	// RateLimiter implement rate limiter with wait option.
 	RateLimiter struct {
 		notify  chan struct{}
-		curRate int32
-		maxRate int32
+		curRate int64
+		maxRate int64
 	}
 )
 
@@ -28,9 +29,9 @@ type (
 // Requests over rate (rate < i <= rate+burst) holds in queue before next spot released.
 // On context cancel or deadline expires request leaves the queue fast and returns false.
 func (ratelimiter *RateLimiter) Take(ctx context.Context) bool {
-	defer atomic.AddInt32(&ratelimiter.curRate, -1)
+	defer atomic.AddInt64(&ratelimiter.curRate, -1)
 
-	if atomic.AddInt32(&ratelimiter.curRate, 1) > ratelimiter.maxRate {
+	if atomic.AddInt64(&ratelimiter.curRate, 1) > ratelimiter.maxRate {
 		return false
 	}
 
@@ -52,10 +53,12 @@ func New(bottleneck Bottleneck) (*RateLimiter, func()) {
 	needShutdown := atomic.Bool{}
 
 	ratelimiter := &RateLimiter{
-		curRate: int32(0),
-		maxRate: int32(bottleneck.MaxRate()),
+		curRate: int64(0),
+		maxRate: int64(bottleneck.MaxRate()),
 		notify:  make(chan struct{}),
 	}
+
+	runtime.SetFinalizer(ratelimiter, func(_ *RateLimiter) { needShutdown.Store(true) })
 
 	go func() {
 		for !needShutdown.Load() {
@@ -65,5 +68,5 @@ func New(bottleneck Bottleneck) (*RateLimiter, func()) {
 		close(ratelimiter.notify)
 	}()
 
-	return ratelimiter, func() { needShutdown.Store(true) }
+	return ratelimiter, func() {}
 }
