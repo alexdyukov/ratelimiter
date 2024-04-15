@@ -22,7 +22,7 @@ Package provides methods to rate limit any type of requests (not only http). Use
 
 Overhead of each Take()/Wait() request with infinity rate:
 ```go
-$ # RegularBottleneck lies on memory usage because uses slice of time.Time{} with length of required RPS
+$ # RegularBottleneck lies on memory usage because uses slice of int64 with length of required RPS
 $ go test -bench=. -benchmem -benchtime=10000000x
 goos: linux
 goarch: amd64
@@ -57,8 +57,7 @@ func main() {
         burst := 25
 
         bn := bottleneck.NewRegular(rps, burst)
-        rl, shutdown := ratelimiter.New(bn)
-        defer shutdown()
+        rl := ratelimiter.New(bn)
 
         echo := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
                 if !rl.Take(r.Context()) {
