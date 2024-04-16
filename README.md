@@ -48,8 +48,8 @@ import (
         "io/ioutil"
         "net/http"
 
-        "github.com/alexdyukov/ratelimiter"
-        "github.com/alexdyukov/ratelimiter/bottleneck"
+        "github.com/alexdyukov/ratelimiter/v2"
+        "github.com/alexdyukov/ratelimiter/v2/bottleneck"
 )
 
 func main() {

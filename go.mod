@@ -1,15 +1,8 @@
-module github.com/alexdyukov/ratelimiter
+module github.com/alexdyukov/ratelimiter/v2
 
 go 1.19
 
-replace github.com/alexdyukov/ratelimiter => ./
-
-retract (
-	v1.1.0 // invalid implementation
-	v1.0.5 // invalid implementation
-	v1.0.4 // invalid implementation
-	v1.0.0 // invalid implementation
-)
+replace github.com/alexdyukov/ratelimiter/v2 => ./
 
 require (
 	github.com/reugn/equalizer v0.2.0
