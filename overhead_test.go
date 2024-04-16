@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexdyukov/ratelimiter"
-	"github.com/alexdyukov/ratelimiter/bottleneck"
+	"github.com/alexdyukov/ratelimiter/v2"
+	"github.com/alexdyukov/ratelimiter/v2/bottleneck"
 	"github.com/reugn/equalizer"
 	"go.uber.org/ratelimit"
 	"golang.org/x/time/rate"

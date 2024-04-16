@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexdyukov/ratelimiter/bottleneck"
+	"github.com/alexdyukov/ratelimiter/v2/bottleneck"
 )
 
 func TestRegular(t *testing.T) {

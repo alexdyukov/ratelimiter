@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexdyukov/ratelimiter"
-	"github.com/alexdyukov/ratelimiter/bottleneck"
+	"github.com/alexdyukov/ratelimiter/v2"
+	"github.com/alexdyukov/ratelimiter/v2/bottleneck"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/goleak"
 )
