@@ -38,7 +38,9 @@ func (ratelimiter *RateLimiter) Take(ctx context.Context) bool {
 	select {
 	case <-ctx.Done():
 		return false
-	case <-ratelimiter.notify:
+	// panic by writes to closed channel impossible, because
+	// channel closed by runtime.SetFinalizer which can be invoked only if `ratelimiter` link lost
+	case ratelimiter.notify <- struct{}{}:
 		return true
 	}
 }
@@ -49,22 +51,24 @@ func New(bottleneck Bottleneck) *RateLimiter {
 		panic("ratelimiter: bottleneck argument cannot be nil")
 	}
 
-	needShutdown := atomic.Bool{}
+	notify := make(chan struct{})
 
 	ratelimiter := &RateLimiter{
 		curRate: int64(0),
 		maxRate: int64(bottleneck.MaxRate()),
-		notify:  make(chan struct{}),
+		notify:  notify,
 	}
 
-	runtime.SetFinalizer(ratelimiter, func(_ *RateLimiter) { needShutdown.Store(true) })
+	runtime.SetFinalizer(ratelimiter, func(_ *RateLimiter) { close(notify) })
 
 	go func() {
-		for !needShutdown.Load() {
+		for {
 			bottleneck.BreakThrough()
-			ratelimiter.notify <- struct{}{}
+
+			if _, ok := <-notify; !ok {
+				return
+			}
 		}
-		close(ratelimiter.notify)
 	}()
 
 	return ratelimiter

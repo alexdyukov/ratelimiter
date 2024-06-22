@@ -3,8 +3,6 @@ package bottleneck_test
 import (
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type testBottleneck interface {
@@ -19,32 +17,36 @@ const (
 	additionalPool int = 200
 )
 
-func wrappedTestBottleneck(t *testing.T, bn testBottleneck, approxTotal, approxAdditional time.Duration) {
+func wrappedTestBottleneck(t *testing.T, bottleneck testBottleneck, approxTotal, approxAdditional time.Duration) {
 	t.Helper()
 
 	startTime := time.Now()
 
 	for i := 0; i < totalRequests; i++ {
-		bn.BreakThrough()
+		bottleneck.BreakThrough()
 	}
 
 	spend := time.Since(startTime)
 	lower := time.Duration(0.95 * float64(approxTotal))
 	higher := time.Duration(1.90 * float64(approxTotal))
 
-	msgFormat := "%v rps with %v total requests should spend at least %v and no more %v, but spend: %v"
-	assert.True(t, lower < spend && spend < higher, msgFormat, rps, totalRequests, lower, higher, spend)
+	if lower >= spend || spend >= higher {
+		msgFormat := "main pool: %v rps with %v total requests should spend at least %v and no more %v, but spend: %v"
+		t.Fatalf(msgFormat, rps, totalRequests, lower, higher, spend)
+	}
 
 	startTime = time.Now()
 
 	for i := 0; i < additionalPool; i++ {
-		bn.BreakThrough()
+		bottleneck.BreakThrough()
 	}
 
 	spend = time.Since(startTime)
 	lower = time.Duration(0.95 * float64(approxAdditional))
 	higher = time.Duration(1.90 * float64(approxAdditional))
 
-	msgFormat = "%v rps with %v total requests should spend at least %v and no more %v, but spend: %v"
-	assert.True(t, lower < spend && spend < higher, msgFormat, rps, totalRequests, lower, higher, spend)
+	if lower >= spend || spend >= higher {
+		msgFormat := "additional pool: %v rps with %v total requests should spend at least %v and no more %v, but spend: %v"
+		t.Fatalf(msgFormat, rps, totalRequests, lower, higher, spend)
+	}
 }
