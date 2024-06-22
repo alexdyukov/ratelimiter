@@ -24,19 +24,16 @@ Overhead of each Take()/Wait() request with infinity rate:
 ```go
 $ # RegularBottleneck lies on memory usage because uses slice of int64 with length of required RPS
 $ go test -bench=. -benchmem -benchtime=10000000x
+warning: GOPATH set to GOROOT (/home/user/go) has no effect
 goos: linux
 goarch: amd64
-pkg: github.com/alexdyukov/ratelimiter
-cpu: AMD Ryzen 7 5800U with Radeon Graphics
-BenchmarkOverheadXTimeRate-16                           10000000               173.0 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadUber-16                                10000000                37.02 ns/op            0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterRegularBottleneck-16        10000000               292.2 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadReugnEqualizerTokenBucket-16           10000000               149.3 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadReugnEqualizerSlider-16                10000000               135.2 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterValveBottleneck-16          10000000               202.5 ns/op             0 B/op          0 allocs/op
-BenchmarkOverheadRateLimiterEqualizerBottleneck-16      10000000               283.3 ns/op             0 B/op          0 allocs/op
+pkg: github.com/alexdyukov/ratelimiter/v2
+cpu: AMD Ryzen 7 8845H w/ Radeon 780M Graphics
+BenchmarkRegularBottleneck-16           10000000               228.6 ns/op             0 B/op          0 allocs/op
+BenchmarkValveBottleneck-16             10000000               163.0 ns/op             0 B/op          0 allocs/op
+BenchmarkEqualizerBottleneck-16         10000000               229.3 ns/op             0 B/op          0 allocs/op
 PASS
-ok      github.com/alexdyukov/ratelimiter       16.011s
+ok      github.com/alexdyukov/ratelimiter/v2    11.662s
 ```
 
 ## Example
@@ -76,4 +73,3 @@ func main() {
 ## License
 
 MIT licensed. See the included LICENSE file for details.
-

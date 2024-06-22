@@ -1,6 +1,5 @@
 run:
   timeout: 5m
-  tests: false
   modules-download-mode: readonly
 
 linters:
@@ -9,6 +8,7 @@ linters:
     - funlen
     - dupl
     - revive
+    - paralleltest # goleak does not support t.Parallel()
 
 linters-settings:
   errcheck:
@@ -24,15 +24,17 @@ linters-settings:
   staticcheck:
     checks: ["all"]
   decorder:
+    ignore-underscore-vars: false
     disable-dec-order-check: false
     disable-init-func-first-check: false
     disable-dec-num-check: false
+    disable-type-dec-num-check: false
+    disable-const-dec-num-check: false
+    disable-var-dec-num-check: false
   dogsled:
     max-blank-identifiers: 1
   errchkjson:
     report-no-exported: true
-  exhaustive:
-    default-signifies-exhaustive: true
   gocognit:
     min-complexity: 10
   gocritic:
@@ -40,8 +42,6 @@ linters-settings:
       - diagnostic
       - style
       - performance
-    disabled-checks:
-      - unnamedResult
     settings:
       captLocal:
         paramsOnly: false

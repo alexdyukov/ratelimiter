@@ -2,6 +2,7 @@ package ratelimiter_test
 
 import (
 	"context"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/alexdyukov/ratelimiter/v2"
 	"github.com/alexdyukov/ratelimiter/v2/bottleneck"
-	"github.com/stretchr/testify/assert"
 	"go.uber.org/goleak"
 )
 
@@ -22,21 +22,19 @@ const (
 )
 
 func TestContextCancel(t *testing.T) {
-	defer detectLeak(t)
+	defer detectLeak(t)()
 
-	bn := bottleneck.NewValve(testRPS, testBurst)
-
-	rateLimiter := ratelimiter.New(bn)
+	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
 
 	successCount := atomic.Int32{}
 
 	// overflow first to be sure of ctx.Done path of select statement
-	var wg sync.WaitGroup
+	var waitGroup sync.WaitGroup
 	for i := 0; i < testRPS; i++ {
-		wg.Add(1)
+		waitGroup.Add(1)
 
 		go func() {
-			defer wg.Done()
+			defer waitGroup.Done()
 
 			retval := rateLimiter.Take(context.Background())
 			if retval {
@@ -44,69 +42,72 @@ func TestContextCancel(t *testing.T) {
 			}
 		}()
 	}
-	wg.Wait()
+	waitGroup.Wait()
 
-	msgFormat := "RateLimiter.Take() should success rps's (%v) times"
-	assert.Equal(t, int32(testRPS), successCount.Load(), msgFormat, testRPS)
+	if actual := successCount.Load(); actual != int32(testRPS) {
+		msgFormat := "RateLimiter.Take() should success %v times, but %v happens"
+		t.Fatalf(msgFormat, testRPS, actual)
+	}
 
 	// overflow end
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	retval := rateLimiter.Take(ctx)
-
-	assert.False(t, retval, "RateLimiter.Take() should return false on canceled contexts")
+	if rateLimiter.Take(ctx) {
+		t.Fatal("RateLimiter.Take() should return false on canceled contexts")
+	}
 }
 
 func TestNoOverflow(t *testing.T) {
-	defer detectLeak(t)
+	defer detectLeak(t)()
 
-	bn := bottleneck.NewValve(testRPS, testBurst)
-
-	rateLimiter := ratelimiter.New(bn)
+	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
 
 	startTime := time.Now()
 
-	var wg sync.WaitGroup
-	for i := 0; i < testRPS+testBurst; i++ {
-		wg.Add(1)
+	var waitGroup sync.WaitGroup
+	for requestNumber := 1; requestNumber <= testRPS+testBurst; requestNumber++ {
+		waitGroup.Add(1)
 
-		go func(i int) {
-			defer wg.Done()
+		go func(requestNumber int) {
+			defer waitGroup.Done()
 
-			retval := rateLimiter.Take(context.Background())
-
-			msgFormat := "RateLimiter.Take() should success %v's request out of total %v"
-			assert.True(t, retval, msgFormat, i, testRPS+testBurst)
-		}(i)
+			if !rateLimiter.Take(context.Background()) {
+				msgFormat := "RateLimiter.Take() should success %v's request out of total %v"
+				t.Errorf(msgFormat, requestNumber, testRPS+testBurst)
+			}
+		}(requestNumber)
 	}
-	wg.Wait()
+	waitGroup.Wait()
 
 	spend := time.Since(startTime)
-	msgFormat := "RateLimiter.Take() should block bursted request for more then 1sec but took %v"
-	assert.Greater(t, spend, time.Second, msgFormat, spend)
 
-	msgFormat = "RateLimiter.Take() should block bursted request no more then 2 sec but took %v"
-	assert.Less(t, spend, 2*time.Second, msgFormat, spend)
+	if spend <= time.Second {
+		msgFormat := "RateLimiter.Take() should block bursted request for more then 1sec but took %v"
+		t.Fatalf(msgFormat, spend)
+	}
+
+	if spend >= 2*time.Second {
+		msgFormat := "RateLimiter.Take() should block bursted request no more then 2 sec but took %v"
+		t.Fatalf(msgFormat, spend)
+	}
 }
 
 func TestOverflow(t *testing.T) {
-	defer detectLeak(t)
+	defer detectLeak(t)()
 
-	bn := bottleneck.NewValve(testRPS, testBurst)
-
-	rateLimiter := ratelimiter.New(bn)
+	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
 
 	successCount := atomic.Int32{}
 	failCount := atomic.Int32{}
 
-	var wg sync.WaitGroup
+	var waitGroup sync.WaitGroup
 	for i := 0; i < 2*(testRPS+testBurst); i++ {
-		wg.Add(1)
+		waitGroup.Add(1)
 
 		go func() {
-			defer wg.Done()
+			defer waitGroup.Done()
 
 			if rateLimiter.Take(context.Background()) {
 				successCount.Add(1)
@@ -115,19 +116,27 @@ func TestOverflow(t *testing.T) {
 			}
 		}()
 	}
-	wg.Wait()
+	waitGroup.Wait()
 
-	msgFormat := "RateLimiter.Take() should success at least rps's (%v) times"
-	assert.LessOrEqual(t, int32(testRPS+testBurst), successCount.Load(), msgFormat, testRPS)
+	if actualSuccessed := successCount.Load(); actualSuccessed < int32(testRPS+testBurst) {
+		msgFormat := "RateLimiter.Take() should success at least rps's (%v) times, but %v"
+		t.Fatalf(msgFormat, testRPS+testBurst, actualSuccessed)
+	}
 
-	msgFormat = "RateLimiter.Take() should fail at least once when we push over queue, but %v"
-	assert.Less(t, int32(0), failCount.Load(), msgFormat, failCount.Load())
+	if actualFailed := failCount.Load(); actualFailed <= 0 {
+		msgFormat := "RateLimiter.Take() should fail at least once when we hang out of limits (%v)"
+		t.Fatalf(msgFormat, testRPS+testBurst)
+	}
 }
 
 func detectLeak(t *testing.T) func() {
+	t.Helper()
+
 	return func() {
 		// let background shutdown function completes
 		time.Sleep(time.Second)
+
+		runtime.GC()
 
 		goleak.VerifyNone(t)
 	}
