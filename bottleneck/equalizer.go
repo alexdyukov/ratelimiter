@@ -13,6 +13,25 @@ type Equalizer struct {
 	burst        int
 }
 
+// NewEqualizer returns equalized implementation of Bottleneck.
+func NewEqualizer(rps, burst int) (*Equalizer, error) {
+	if rps <= 0 {
+		return nil, ErrRPSNegativeOrZero
+	}
+
+	if burst < 0 {
+		return nil, ErrBurstNegative
+	}
+
+	bottleneck := &Equalizer{
+		lastCheckout: time.Now().Add(-1 * time.Second).UnixNano(),
+		diffDuration: int64(time.Second) / int64(rps),
+		burst:        burst,
+	}
+
+	return bottleneck, nil
+}
+
 // BreakThrough passes through bottle neck. Waits and pass if it busy.
 func (bottleneck *Equalizer) BreakThrough() {
 	newTime := bottleneck.lastCheckout + bottleneck.diffDuration
@@ -26,21 +45,4 @@ func (bottleneck *Equalizer) BreakThrough() {
 // MaxRate returns max rate for both simultaneously processed and in queue requests.
 func (bottleneck *Equalizer) MaxRate() int {
 	return int(int64(time.Second)/bottleneck.diffDuration) + bottleneck.burst
-}
-
-// NewEqualizer returns equalized implementation of Bottleneck.
-func NewEqualizer(rps, burst int) *Equalizer {
-	if rps <= 0 {
-		panic("bottleneck: rps argument should be greater 0")
-	}
-
-	if burst < 0 {
-		panic("bottleneck: burst argument should be greater or equal 0")
-	}
-
-	return &Equalizer{
-		lastCheckout: time.Now().Add(-1 * time.Second).UnixNano(),
-		diffDuration: int64(time.Second) / int64(rps),
-		burst:        burst,
-	}
 }

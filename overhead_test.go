@@ -11,7 +11,12 @@ import (
 func BenchmarkRegularBottleneck(b *testing.B) {
 	b.StopTimer()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewRegular(overheadTestRPS, overheadTestBurst))
+	bn, err := bottleneck.NewRegular(overheadTestRPS, overheadTestBurst)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 
@@ -27,7 +32,12 @@ func BenchmarkRegularBottleneck(b *testing.B) {
 func BenchmarkValveBottleneck(b *testing.B) {
 	b.StopTimer()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewValve(overheadTestRPS, overheadTestBurst))
+	bn, err := bottleneck.NewValve(overheadTestRPS, overheadTestBurst)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 
@@ -43,7 +53,12 @@ func BenchmarkValveBottleneck(b *testing.B) {
 func BenchmarkEqualizerBottleneck(b *testing.B) {
 	b.StopTimer()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewEqualizer(overheadTestRPS, overheadTestBurst))
+	bn, err := bottleneck.NewEqualizer(overheadTestRPS, overheadTestBurst)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	ctx := context.Background()
 

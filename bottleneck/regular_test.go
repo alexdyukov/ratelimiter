@@ -8,8 +8,12 @@ import (
 )
 
 func TestRegular(t *testing.T) {
-	regular := bottleneck.NewRegular(rps, burst)
+	bn, err := bottleneck.NewRegular(rps, burst)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	approxTotal := float64(totalRequests/rps) * float64(time.Second)
 	approxAdditional := time.Second
-	wrappedTestBottleneck(t, regular, time.Duration(approxTotal), approxAdditional)
+	wrappedTestBottleneck(t, bn, time.Duration(approxTotal), approxAdditional)
 }

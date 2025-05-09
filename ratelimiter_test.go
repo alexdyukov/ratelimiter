@@ -24,7 +24,12 @@ const (
 func TestContextCancel(t *testing.T) {
 	defer detectLeak(t)()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
+	bn, err := bottleneck.NewValve(testRPS, testBurst)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	successCount := atomic.Int32{}
 
@@ -42,6 +47,7 @@ func TestContextCancel(t *testing.T) {
 			}
 		}()
 	}
+
 	waitGroup.Wait()
 
 	if actual := successCount.Load(); actual != int32(testRPS) {
@@ -62,7 +68,12 @@ func TestContextCancel(t *testing.T) {
 func TestNoOverflow(t *testing.T) {
 	defer detectLeak(t)()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
+	bn, err := bottleneck.NewValve(testRPS, testBurst)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	startTime := time.Now()
 
@@ -79,6 +90,7 @@ func TestNoOverflow(t *testing.T) {
 			}
 		}(requestNumber)
 	}
+
 	waitGroup.Wait()
 
 	spend := time.Since(startTime)
@@ -97,7 +109,12 @@ func TestNoOverflow(t *testing.T) {
 func TestOverflow(t *testing.T) {
 	defer detectLeak(t)()
 
-	rateLimiter := ratelimiter.New(bottleneck.NewValve(testRPS, testBurst))
+	bn, err := bottleneck.NewValve(testRPS, testBurst)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rateLimiter := ratelimiter.New(bn)
 
 	successCount := atomic.Int32{}
 	failCount := atomic.Int32{}
@@ -116,6 +133,7 @@ func TestOverflow(t *testing.T) {
 			}
 		}()
 	}
+
 	waitGroup.Wait()
 
 	if actualSuccessed := successCount.Load(); actualSuccessed < int32(testRPS+testBurst) {
