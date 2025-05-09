@@ -1,7 +1,9 @@
 name: update_deps
+
 on:
   schedule:
     - cron: '0 0 * * 0'
+
 jobs:
   update_deps:
     runs-on: ubuntu-latest
@@ -10,14 +12,17 @@ jobs:
         shell: bash
     steps:
       - name: Install golang
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 'oldstable'
           check-latest: true
+
       - name: Checkout git repository
         uses: actions/checkout@v4
+
       - name: Locally update dependencies
-        run: go get -u ./... && go mod tidy
+        run: go get -u ./... && go mod tidy && go get -u ./...
+
       - name: Commit changes and create PR if we have any changes
         run: bash .github/update_deps.sh
         env:

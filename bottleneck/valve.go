@@ -13,6 +13,26 @@ type Valve struct {
 	burst        int
 }
 
+// NewValve returns valve implementation of Bottleneck.
+func NewValve(rps, burst int) (*Valve, error) {
+	if rps <= 0 {
+		return nil, ErrRPSNegativeOrZero
+	}
+
+	if burst < 0 {
+		return nil, ErrBurstNegative
+	}
+
+	bottleneck := &Valve{
+		lastCheckout: time.Now().UnixNano(),
+		currentRate:  0,
+		rps:          rps,
+		burst:        burst,
+	}
+
+	return bottleneck, nil
+}
+
 // BreakThrough passes through bottle neck. Waits and pass if it busy.
 func (bottleneck *Valve) BreakThrough() {
 	if bottleneck.currentRate < bottleneck.rps {
@@ -34,22 +54,4 @@ func (bottleneck *Valve) BreakThrough() {
 // MaxRate returns max rate for both simultaneously processed and in queue requests.
 func (bottleneck *Valve) MaxRate() int {
 	return bottleneck.rps + bottleneck.burst
-}
-
-// NewValve returns valve implementation of Bottleneck.
-func NewValve(rps, burst int) *Valve {
-	if rps <= 0 {
-		panic("bottleneck: rps argument should be greater 0")
-	}
-
-	if burst < 0 {
-		panic("bottleneck: burst argument should be greater or equal 0")
-	}
-
-	return &Valve{
-		lastCheckout: time.Now().UnixNano(),
-		currentRate:  0,
-		rps:          rps,
-		burst:        burst,
-	}
 }
