@@ -1,7 +1,9 @@
 package bottleneck
 
 // LeakyBucket typed Bottleneck implements leaky bucket algorithm.
-type LeakyBucket Regular
+type LeakyBucket struct {
+	Regular
+}
 
 // NewLeakyBucket returns leaky bucket algo implementation of Bottleneck.
 func NewLeakyBucket(size int) (*LeakyBucket, error) {
@@ -10,7 +12,7 @@ func NewLeakyBucket(size int) (*LeakyBucket, error) {
 		return nil, err
 	}
 
-	ret := LeakyBucket(*bn)
+	ret := LeakyBucket{*bn}
 
 	return &ret, nil
 }
