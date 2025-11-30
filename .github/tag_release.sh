@@ -5,8 +5,8 @@ MAJOR_LAST_COMMIT_HASH="3f57a989ba3877f34702a5e3db41fdfadc0d3f9b"
 MINOR_LAST_COMMIT_HASH=$(git rev-list --invert-grep -i --grep='fix' ${MAJOR_LAST_COMMIT_HASH}..HEAD --no-merges -n 1)
 MINOR_VERSION=$(git rev-list --invert-grep -i --grep='fix' ${MAJOR_LAST_COMMIT_HASH}..HEAD --no-merges --count)
 
-[ "${MINOR_LAST_COMMIT_HASH}" = "" ] && MINOR_VERSION="0" 
-[ "${MINOR_LAST_COMMIT_HASH}" = "" ] && MINOR_LAST_COMMIT_HASH=${MAJOR_LAST_COMMIT_HASH} 
+[ "${MINOR_LAST_COMMIT_HASH}" = "" ] && MINOR_VERSION="0"
+[ "${MINOR_LAST_COMMIT_HASH}" = "" ] && MINOR_LAST_COMMIT_HASH=${MAJOR_LAST_COMMIT_HASH}
 
 PATCH_VERSION=$(git rev-list ${MINOR_LAST_COMMIT_HASH}..HEAD --no-merges --count)
 

@@ -1,0 +1,29 @@
+name: test
+
+on:
+  push:
+    branches-ignore:
+    - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install golang
+        uses: actions/setup-go@v6
+        with:
+          go-version: 'stable'
+          check-latest: true
+      - name: Checkout git repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check that code is updated
+        run: go get -u ./... && go mod tidy && go get -u ./... && git diff --exit-code
+      - name: Run tests
+        run: go test -race -parallel 2 -shuffle on -v -coverprofile ./...
+        env:
+          # race requires cgo
+          CGO_ENABLED: 1
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v7
