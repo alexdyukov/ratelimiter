@@ -13,7 +13,7 @@ git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${REPO_N
 git checkout -b ${BRANCH_NAME}
 
 # 4. commit changes or fast exit
-git commit -am "Fix: $(date +%F) update dependencies" || exit 0
+git commit -am "FIX: $(date +%F) update dependencies" || exit 0
 git push --set-upstream origin ${BRANCH_NAME} -f || exit 0
 
 # 5. run tests after update
