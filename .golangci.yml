@@ -3,7 +3,7 @@ version: "2"
 linters:
   default: all
   disable:
-    - paralleltest
+    - paralleltest # go.uber.org/goleak does not support parallel test runs
   settings:
     gomoddirectives:
       replace-local: true
