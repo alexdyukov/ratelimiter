@@ -26,4 +26,4 @@ jobs:
           # race requires cgo
           CGO_ENABLED: 1
       - name: Run linters
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
