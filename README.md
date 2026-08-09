@@ -2,7 +2,6 @@
 Go universal rate limiter with easy to use API.
 ====
 [![Go Reference](https://pkg.go.dev/badge/image)](https://pkg.go.dev/github.com/alexdyukov/ratelimiter)
-[![Go Report](https://goreportcard.com/badge/github.com/alexdyukov/ratelimiter)](https://goreportcard.com/report/github.com/alexdyukov/ratelimiter)
 [![Go Coverage](https://github.com/alexdyukov/ratelimiter/wiki/coverage.svg)](https://raw.githack.com/wiki/alexdyukov/ratelimiter/coverage.html)
 
 Package provides methods to rate limit any type of requests (not only http). Use builtin Bottlenecks or write your own for custom bottle neck logic.
